@@ -1,0 +1,41 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+import { RolesService } from '../roles/roles.service';
+
+@Injectable()
+export class UsersService {
+
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+    private rolesService: RolesService,
+  )
+  {}
+
+  async create(createUserDto: CreateUserDto) {
+    return await this.usersRepository.save(createUserDto);
+  }
+
+  async findAll() {
+    return await this.usersRepository.find();
+  }
+
+  async findOne(id: number) {
+    return await this.usersRepository.findOneBy({id: id});
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    let user : User = await this.findOne(id);
+    user.password = updateUserDto.password;
+    user.role = await this.rolesService.findOne(updateUserDto.roleId);
+    return await this.usersRepository.save(user);
+  }
+
+  async remove(id: number) {
+    return await this.usersRepository.delete(id);
+  }
+}

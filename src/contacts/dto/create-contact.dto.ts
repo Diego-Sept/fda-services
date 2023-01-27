@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Client } from "src/clients/entities/client.entity";
 
 export class CreateContactDto {
 
@@ -15,6 +16,6 @@ export class CreateContactDto {
     mainContact?: boolean;
 
     @ApiProperty()
-    clientId?: number;
+    client?: Client;
 
 }

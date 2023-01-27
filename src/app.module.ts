@@ -11,6 +11,11 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { RolesModule } from './roles/roles.module';
 import { Role } from './roles/entities/role.entity';
+import { ProductsModule } from './products/products.module';
+import { StoresModule } from './stores/stores.module';
+import { StockModule } from './stock/stock.module';
+import { FractionsModule } from './fractions/fractions.module';
+import { Product } from './products/entities/product.entity';
 
 @Module({
   imports: [
@@ -25,7 +30,8 @@ import { Role } from './roles/entities/role.entity';
           Client,
           Contact,
           User,
-          Role
+          Role,
+          //Product
       ],
       synchronize: true,
     }),
@@ -33,6 +39,10 @@ import { Role } from './roles/entities/role.entity';
     ContactsModule,
     UsersModule,
     RolesModule,
+    ProductsModule,
+    StoresModule,
+    StockModule,
+    FractionsModule,
   ],
   controllers: [AppController],
   providers: [

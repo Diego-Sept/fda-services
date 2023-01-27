@@ -5,12 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Client } from './entities/client.entity';
 import { ContactsModule } from '../contacts/contacts.module';
 import { UsersModule } from '../users/users.module';
+import { RolesModule } from '../roles/roles.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Client]),
-    ContactsModule,
-    UsersModule
+    forwardRef(() => ContactsModule),
+    forwardRef(() => UsersModule),
+    forwardRef(() => RolesModule)
   ],
   controllers: [ClientsController],
   providers: [

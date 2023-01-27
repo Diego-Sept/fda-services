@@ -1,4 +1,4 @@
-import { BeforeInsert, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Role } from '../../roles/entities/role.entity';
 import { Client } from '../../clients/entities/client.entity';
 import * as bcrypt from 'bcrypt';
@@ -16,13 +16,19 @@ export class User {
     @Column()
     password: string;
 
-    @OneToOne( () => Role)
+    @ManyToOne( () => Role, (role) => role.id)
     @JoinColumn()
     role: Role;
 
-    @OneToOne( () => Client)
+    @OneToOne( () => Client, (client) => client.id)
     @JoinColumn()
     client: Client;
+
+    @Column()
+    clientId: number;
+
+    @Column()
+    roleId: number;
 
     @BeforeInsert()
     async hashPassword() {

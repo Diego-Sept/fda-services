@@ -1,5 +1,6 @@
 import { User } from 'src/users/entities/user.entity';
 import { Contact } from '../../../contacts/entities/contact.entity';
+import { UserResponseDTO } from '../../../users/dto/response/UserResponseDTO';
 
 export class ClientResponseDTO{
 
@@ -15,6 +16,6 @@ export class ClientResponseDTO{
 
     contacts?: Contact[];
 
-    user?: User;
+    user?: UserResponseDTO;
 
 }

@@ -33,4 +33,9 @@ export class ContactsController {
   async remove(@Param('id') id: string) {
     return await this.contactsService.remove(+id);
   }
+
+  @Get("byClient/:clientId")
+  async getContactsByClientId(@Param('clientId') clientId: number){
+    return await this.contactsService.getContactsByClientId(clientId);
+  }
 }

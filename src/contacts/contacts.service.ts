@@ -35,12 +35,15 @@ export class ContactsService {
     contactToUpdate.phone = updateContactDto.phone;
     contactToUpdate.email = updateContactDto.email;
     contactToUpdate.mainContact = updateContactDto.mainContact;
-    contactToUpdate.client = await this.clientsService.findOne(updateContactDto.clientId);
 
     return await this.contactRepository.save(contactToUpdate);
   }
 
   async remove(id: number) {
     return await this.contactRepository.delete({id: id})
+  }
+
+  async getContactsByClientId(clientId: number){
+    return this.contactRepository.findBy({clientId: clientId});
   }
 }

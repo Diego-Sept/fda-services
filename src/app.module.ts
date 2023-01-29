@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientsModule } from './clients/clients.module';
@@ -31,7 +30,7 @@ import { Product } from './products/entities/product.entity';
           Contact,
           User,
           Role,
-          //Product
+          Product
       ],
       synchronize: true,
     }),
@@ -49,4 +48,5 @@ import { Product } from './products/entities/product.entity';
     AppService
   ],
 })
-export class AppModule {}
+export class AppModule{
+}

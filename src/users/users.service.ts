@@ -1,15 +1,16 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { RolesService } from '../roles/roles.service';
-import { ClientsService } from 'src/clients/clients.service';
 import { UserResponseDTO } from './dto/response/UserResponseDTO';
 
 @Injectable()
 export class UsersService {
+
+  private readonly logger = new Logger(UsersService.name);
 
   constructor(
     @InjectRepository(User)
@@ -19,7 +20,7 @@ export class UsersService {
   {}
 
   async create(createUserDto: CreateUserDto) {
-    return await this.usersRepository.save(createUserDto);
+    return await this.getUserResponseDto(await this.usersRepository.save(createUserDto));
   }
 
   async findAll() {
@@ -38,7 +39,7 @@ export class UsersService {
     } else if (updateUserDto.role){
       user.role = updateUserDto.role;
     }
-    return await this.usersRepository.save(user);
+    return await this.getUserResponseDto(await this.usersRepository.save(user));
   }
 
   async remove(id: number) {

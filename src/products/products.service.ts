@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -8,6 +8,8 @@ import { NotFoundException } from '@nestjs/common/exceptions';
 
 @Injectable()
 export class ProductsService {
+
+  private readonly logger = new Logger(ProductsService.name);
 
   constructor(
     @InjectRepository(Product)

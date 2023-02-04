@@ -15,6 +15,7 @@ import { StoresModule } from './stores/stores.module';
 import { StockModule } from './stock/stock.module';
 import { FractionsModule } from './fractions/fractions.module';
 import { Product } from './products/entities/product.entity';
+import { Store } from './stores/entities/store.entity';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { Product } from './products/entities/product.entity';
           Contact,
           User,
           Role,
-          Product
+          Product,
+          Store
       ],
       synchronize: true,
     }),

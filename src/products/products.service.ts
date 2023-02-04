@@ -33,10 +33,8 @@ export class ProductsService {
 
     if (!!productToUpdate){
       productToUpdate.name = updateProductDto.name;
-    } else {
-      return new NotFoundException("No se ha encontrado el producto con el id " + id)
-    }
-    
+    } 
+        
     return await this.productsRepository.save(productToUpdate);
   }
 

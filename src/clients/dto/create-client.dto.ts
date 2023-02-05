@@ -14,4 +14,7 @@ export class CreateClientDto {
     @ApiProperty()
     guestsQuantity: number;
 
+    @ApiProperty()
+    address: string;
+
 }

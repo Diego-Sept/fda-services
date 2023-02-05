@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClientDto } from './dto/client-dto';
@@ -19,91 +19,92 @@ import { Role } from 'src/roles/entities/role.entity';
 @Injectable()
 export class ClientsService {
 
-  constructor(
-    @InjectRepository(Client)
-    private clientsRepository: Repository<Client>,
-    @Inject(forwardRef(() => ContactsService))
-    private contactsService: ContactsService,
-    @Inject(forwardRef(() => UsersService))
-    private usersService: UsersService,
-    @Inject(forwardRef(() => RolesService))
-    private rolesService: RolesService,
-  )
-  {}
+	private readonly logger = new Logger(ClientsService.name);
 
-  async create(clientDto: ClientDto) {
-    debugger;
-    let client: Client =  await this.clientsRepository.save(clientDto.clientData);
+	constructor(
+		@InjectRepository(Client)
+		private clientsRepository: Repository<Client>,
+		@Inject(forwardRef(() => ContactsService))
+		private contactsService: ContactsService,
+		@Inject(forwardRef(() => UsersService))
+		private usersService: UsersService,
+		@Inject(forwardRef(() => RolesService))
+		private rolesService: RolesService,
+	) { }
 
-    let clientResponseDto : ClientResponseDTO = {...client};
+	async create(clientDto: ClientDto) {
+		let client: Client = await this.clientsRepository.save(clientDto.clientData);
+		this.logger.log("Cliente al guardar", client);
 
-    if (!!clientDto.contacts){
-      let contacts : Contact[] = [];
-      clientDto.contacts.forEach(contact => {
-        contact.client = client;
-        this.contactsService.create(contact).then(newContact => {
-          contacts.push(newContact);  
-        });
-      })
-      clientResponseDto.contacts = contacts;
-    }
+		let clientResponseDto: ClientResponseDTO = { ...client };
 
-    
-    let roleReturned : Role = await this.rolesService.findOne(clientDto.roleId);
+		clientResponseDto.contacts = [];
+		if (!!clientDto?.contacts) {
+			for(let contact of clientDto.contacts){
+				contact.client = client;
+				let contactResponse = await this.contactsService.create(contact);
+				this.logger.log("Contacto: ", contactResponse);
+				clientResponseDto.contacts.push(contactResponse);
+				this.logger.log("Cliente de respuesta contacto: ", clientResponseDto);
+			}
+		}
 
-    let createUserDto : CreateUserDto = {
-      username: clientDto.clientData.identificationNumber,
-      role: roleReturned,
-      password: generator.generate({
-        length: 8,
-        numbers: true,
-        uppercase: false,
-        symbols: false
-      }),
-      client: client
-    }
+		let roleReturned: Role = await this.rolesService.findOne(clientDto.roleId);
 
-    let user = await this.usersService.create(createUserDto);
-    clientResponseDto.user = user;
+		let createUserDto: CreateUserDto = {
+			username: clientDto.clientData.identificationNumber,
+			role: roleReturned,
+			password: generator.generate({
+				length: 8,
+				numbers: true,
+				uppercase: false,
+				symbols: false
+			}),
+			client: client
+		}
 
-    return clientResponseDto;
-  }
+		let user = await this.usersService.create(createUserDto);
+		clientResponseDto.user = user;
+		this.logger.log("Cliente de respuesta: ", clientResponseDto);
 
-  async findAll() {
-    let clients : Client[] = await this.clientsRepository.find();
-    
-    let clientsResponse : ClientResponseDTO[] = [];
+		return await clientResponseDto;
+	}
 
-    for (let client of clients){
-      let clientResponseDTO = await this.getClientDto(client);
-      clientsResponse.push(clientResponseDTO);
-    }
-    
-    return clientsResponse;
-  }
+	async findAll() {
+		let clients: Client[] = await this.clientsRepository.find();
 
-  async findOne(id: number) {
-    return this.clientsRepository.findOneBy({id: id}).then(async client => {
-      return await this.getClientDto(client);
-    })
-  }
+		let clientsResponse: ClientResponseDTO[] = [];
 
-  async update(id: number, updateClientDto: UpdateClientDto) {
+		for (let client of clients) {
+			let clientResponseDTO = await this.getClientDto(client);
+			clientsResponse.push(clientResponseDTO);
+		}
 
-    return await this.clientsRepository.save(updateClientDto);
-  }
+		return clientsResponse;
+	}
 
-  async remove(id: number) {
-    return await this.clientsRepository.delete(id);
-  }
+	async findOne(id: number) {
+		return this.clientsRepository.findOneBy({ id: id }).then(async client => {
+			return await this.getClientDto(client);
+		})
+	}
 
-  async getClientDto(client : Client) : Promise<ClientResponseDTO> {
-    let clientResponseDto : ClientResponseDTO = {
-      ...client,
-    };
-    clientResponseDto.contacts = await this.contactsService.getContactsByClientId(client.id);
-    clientResponseDto.user = await this.usersService.getUserByClientId(client.id);
+	async update(id: number, updateClientDto: UpdateClientDto) {
 
-    return clientResponseDto;
-  }
+		return await this.clientsRepository.save(updateClientDto);
+	}
+
+	async remove(id: number) {
+		return await this.clientsRepository.delete(id);
+	}
+
+	async getClientDto(client: Client): Promise<ClientResponseDTO> {
+		let clientResponseDto: ClientResponseDTO = {
+			...client,
+		};
+		clientResponseDto.contacts = await this.contactsService.getContactsByClientId(client.id);
+		clientResponseDto.user = await this.usersService.getUserByClientId(client.id);
+
+		return clientResponseDto;
+	}
 }

@@ -14,6 +14,8 @@ export class ClientResponseDTO{
 
     guestsQuantity: number;
 
+    address: string;
+
     contacts?: Contact[];
 
     user?: UserResponseDTO;

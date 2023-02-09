@@ -15,6 +15,7 @@ import { User } from 'src/users/entities/user.entity';
 import { resolve } from 'path';
 import { RolesService } from '../roles/roles.service';
 import { Role } from 'src/roles/entities/role.entity';
+import { NotFoundException } from '@nestjs/common/exceptions';
 
 @Injectable()
 export class ClientsService {
@@ -38,8 +39,8 @@ export class ClientsService {
 
 		let clientResponseDto: ClientResponseDTO = { ...client };
 
-		clientResponseDto.contacts = [];
 		if (!!clientDto?.contacts) {
+			clientResponseDto.contacts = [];
 			for(let contact of clientDto.contacts){
 				contact.client = client;
 				let contactResponse = await this.contactsService.create(contact);
@@ -95,7 +96,23 @@ export class ClientsService {
 	}
 
 	async remove(id: number) {
-		return await this.clientsRepository.delete(id);
+		let client : ClientResponseDTO = await this.findOne(id);
+		
+		if (!!client){ 
+			if (!!client.contacts){
+				for (let contact of client.contacts){
+					await this.contactsService.remove(contact.id);
+				}
+			}
+			
+			if (!!client.user){
+				await this.usersService.remove(client.user.id);
+			}
+
+			await this.clientsRepository.delete(id);
+		} else {
+			return new NotFoundException("The client with id " + id + " couldn't been found.");
+		}
 	}
 
 	async getClientDto(client: Client): Promise<ClientResponseDTO> {

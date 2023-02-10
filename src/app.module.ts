@@ -16,6 +16,15 @@ import { StockModule } from './stock/stock.module';
 import { FractionsModule } from './fractions/fractions.module';
 import { Product } from './products/entities/product.entity';
 import { Store } from './stores/entities/store.entity';
+import { ClientFractionModule } from './client-fraction/client-fraction.module';
+import { Stock } from './stock/entities/stock.entity';
+import { Fraction } from './fractions/entities/fraction.entity';
+import { ClientFraction } from './client-fraction/entities/client-fraction.entity';
+import { EventTypesModule } from './event-types/event-types.module';
+import { SaloonsModule } from './saloons/saloons.module';
+import { BudgetsModule } from './budgets/budgets.module';
+import { Saloon } from './saloons/entities/saloon.entity';
+import { EventType } from './event-types/entities/event-type.entity';
 
 @Module({
   imports: [
@@ -32,7 +41,12 @@ import { Store } from './stores/entities/store.entity';
           User,
           Role,
           Product,
-          Store
+          Store,
+          Stock,
+          Fraction,
+          ClientFraction,
+          Saloon,
+          EventType,
       ],
       synchronize: true,
     }),
@@ -44,6 +58,10 @@ import { Store } from './stores/entities/store.entity';
     StoresModule,
     StockModule,
     FractionsModule,
+    ClientFractionModule,
+    EventTypesModule,
+    SaloonsModule,
+    BudgetsModule,
   ],
   controllers: [AppController],
   providers: [

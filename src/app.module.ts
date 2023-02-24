@@ -29,10 +29,10 @@ import { EventType } from './event-types/entities/event-type.entity';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'postgres',
+      type: 'mysql',
       host: 'localhost',
-      port: 5432,
-      username: 'postgres',
+      port: 3306,
+      username: 'root',
       password: 'root',
       database: 'fda',
       entities: [

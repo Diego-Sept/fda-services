@@ -2,33 +2,35 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { StoresService } from './stores.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('stores')
+@ApiTags("Stores")
 export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
   @Post()
-  create(@Body() createStoreDto: CreateStoreDto) {
-    return this.storesService.create(createStoreDto);
+  async create(@Body() createStoreDto: CreateStoreDto) {
+    return await this.storesService.create(createStoreDto);
   }
 
   @Get()
-  findAll() {
-    return this.storesService.findAll();
+  async findAll() {
+    return await this.storesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.storesService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.storesService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStoreDto: UpdateStoreDto) {
-    return this.storesService.update(+id, updateStoreDto);
+  async update(@Param('id') id: string, @Body() updateStoreDto: UpdateStoreDto) {
+    return await this.storesService.update(+id, updateStoreDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.storesService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return await this.storesService.remove(+id);
   }
 }

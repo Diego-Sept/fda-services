@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientsModule } from './clients/clients.module';
@@ -16,14 +15,24 @@ import { StoresModule } from './stores/stores.module';
 import { StockModule } from './stock/stock.module';
 import { FractionsModule } from './fractions/fractions.module';
 import { Product } from './products/entities/product.entity';
+import { Store } from './stores/entities/store.entity';
+import { ClientFractionModule } from './client-fraction/client-fraction.module';
+import { Stock } from './stock/entities/stock.entity';
+import { Fraction } from './fractions/entities/fraction.entity';
+import { ClientFraction } from './client-fraction/entities/client-fraction.entity';
+import { EventTypesModule } from './event-types/event-types.module';
+import { SaloonsModule } from './saloons/saloons.module';
+import { BudgetsModule } from './budgets/budgets.module';
+import { Saloon } from './saloons/entities/saloon.entity';
+import { EventType } from './event-types/entities/event-type.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'postgres',
+      type: 'mysql',
       host: 'localhost',
-      port: 5432,
-      username: 'postgres',
+      port: 3306,
+      username: 'root',
       password: 'root',
       database: 'fda',
       entities: [
@@ -31,7 +40,13 @@ import { Product } from './products/entities/product.entity';
           Contact,
           User,
           Role,
-          //Product
+          Product,
+          Store,
+          Stock,
+          Fraction,
+          ClientFraction,
+          Saloon,
+          EventType,
       ],
       synchronize: true,
     }),
@@ -43,10 +58,15 @@ import { Product } from './products/entities/product.entity';
     StoresModule,
     StockModule,
     FractionsModule,
+    ClientFractionModule,
+    EventTypesModule,
+    SaloonsModule,
+    BudgetsModule,
   ],
   controllers: [AppController],
   providers: [
     AppService
   ],
 })
-export class AppModule {}
+export class AppModule{
+}

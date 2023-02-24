@@ -23,4 +23,7 @@ export class Client {
     @OneToMany(() => Contact, (contact) => contact.client)
     contacts: Contact[];
 
+    @Column()
+    address: string;
+
 }

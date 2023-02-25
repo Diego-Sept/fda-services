@@ -25,6 +25,7 @@ import { SaloonsModule } from './saloons/saloons.module';
 import { BudgetsModule } from './budgets/budgets.module';
 import { Saloon } from './saloons/entities/saloon.entity';
 import { EventType } from './event-types/entities/event-type.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { EventType } from './event-types/entities/event-type.entity';
           EventType,
       ],
       synchronize: true,
+      migrationsRun: false,
     }),
     ClientsModule,
     ContactsModule,
@@ -62,6 +64,7 @@ import { EventType } from './event-types/entities/event-type.entity';
     EventTypesModule,
     SaloonsModule,
     BudgetsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

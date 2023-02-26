@@ -26,8 +26,8 @@ export class ClientsController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateClientDto: UpdateClientDto) {
-    return await this.clientsService.update(+id, updateClientDto);
+  async update(@Param('id') id: string, @Body() clientDto: ClientDto) {
+    return await this.clientsService.update(+id, clientDto);
   }
 
   @Delete(':id')

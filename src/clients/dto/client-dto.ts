@@ -11,6 +11,6 @@ export class ClientDto {
     contacts: CreateContactDto[];
     
     @ApiProperty()
-    roleId: number;
+    roleId?: number;
 
 }

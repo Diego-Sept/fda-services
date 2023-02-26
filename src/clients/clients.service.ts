@@ -86,9 +86,34 @@ export class ClientsService {
 		})
 	}
 
-	async update(id: number, updateClientDto: UpdateClientDto) {
+	async update(id: number, clientDto: ClientDto) {
+		let clientResponseDto = new ClientResponseDTO();
+		let client = await this.clientsRepository.findOneBy({ id: id });
 
-		return await this.clientsRepository.save(updateClientDto);
+		if (!!client){
+			client.address = clientDto.clientData.address;
+			client.guestsQuantity = clientDto.clientData.guestsQuantity;
+			client.identificationNumber = clientDto.clientData.identificationNumber;
+			client.name = clientDto.clientData.name;
+			client.surname = clientDto.clientData.surname;
+			client = await this.clientsRepository.save(client);
+
+			let contacts = await this.contactsService.getContactsByClientId(id);
+			if (!!contacts){
+				contacts[0].name = clientDto.contacts[0].name;
+				contacts[0].phone = clientDto.contacts[0].phone;
+				contacts[0].email = clientDto.contacts[0].email;
+				contacts[1].name = clientDto.contacts[1].name;
+				contacts[1].phone = clientDto.contacts[1].phone;
+				contacts[1].email = clientDto.contacts[1].email;
+				for (let contact of contacts){
+					this.contactsService.update(contact.id, contact);
+				}
+			}
+		}
+
+		clientResponseDto = await this.getClientDto(client);
+		return clientResponseDto;
 	}
 
 	async remove(id: number) {

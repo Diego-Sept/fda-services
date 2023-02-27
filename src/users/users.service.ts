@@ -23,22 +23,22 @@ export class UsersService {
 	}
 
 	async findAll() {
-		return await this.usersRepository.find();
+		let users: User[] = await this.usersRepository.find();
+
+		let usersResponse: UserResponseDTO[] = [];
+
+		for (let user of users) {
+			let userResponseDTO = await this.getUserResponseDto(user);
+			usersResponse.push(userResponseDTO);
+		}
+
+		return usersResponse;
 	}
 
 	async findOne(id: number) {
-		return await this.usersRepository.findOneBy({ id: id });
-	}
-
-	async update(id: number, updateUserDto: UpdateUserDto) {
-		let user: User = await this.findOne(id);
-		user.password = updateUserDto.password;
-		if (updateUserDto.roleId) {
-			user.role = await this.rolesService.findOne(updateUserDto.roleId);
-		} else if (updateUserDto.role) {
-			user.role = updateUserDto.role;
-		}
-		return await this.getUserResponseDto(await this.usersRepository.save(user));
+		return this.usersRepository.findOneBy({ id: id }).then(async user => {
+			return await this.getUserResponseDto(user);
+		});
 	}
 
 	async remove(id: number) {

@@ -5,7 +5,7 @@ export class UserResponseDTO {
     id: number;
     username: string;
     password: string;
-    clientId: number;
+    clientId?: number;
     role?: Role;
 
 }

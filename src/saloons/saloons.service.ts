@@ -1,26 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateSaloonDto } from './dto/create-saloon.dto';
 import { UpdateSaloonDto } from './dto/update-saloon.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Saloon } from './entities/saloon.entity';
 
 @Injectable()
 export class SaloonsService {
-  create(createSaloonDto: CreateSaloonDto) {
-    return 'This action adds a new saloon';
+ 
+  private readonly logger = new Logger(SaloonsService.name);
+
+  constructor(
+    @InjectRepository(Saloon)
+    private saloonRepository: Repository<Saloon>
+  ){}
+
+  async create(createSaloonDto: CreateSaloonDto) {
+    return await this.saloonRepository.save(createSaloonDto);
   }
 
-  findAll() {
-    return `This action returns all saloons`;
+  async findAll() {
+    return await this.saloonRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} saloon`;
+  async findOne(id: number) {
+    return await this.saloonRepository.findOneBy({id: id});
   }
 
-  update(id: number, updateSaloonDto: UpdateSaloonDto) {
-    return `This action updates a #${id} saloon`;
+  async update(id: number, updateSaloonDto: UpdateSaloonDto) {
+    let saloonToUpdate : Saloon = await this.findOne(id);
+
+    if (!!saloonToUpdate){
+      saloonToUpdate.name = updateSaloonDto.name;
+    } 
+        
+    return await this.saloonRepository.save(saloonToUpdate);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} saloon`;
+  async remove(id: number) {
+    return await this.saloonRepository.delete(id);
   }
 }

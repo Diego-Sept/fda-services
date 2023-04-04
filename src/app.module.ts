@@ -44,10 +44,12 @@ import { AuthModule } from './auth/auth.module';
           Product,
           Store,
           Stock,
+          EventType,
+          Saloon,
           Fraction,
       ],
       synchronize: true,
-      migrationsRun: false,
+      migrationsRun: false
     }),
     ClientsModule,
     ContactsModule,

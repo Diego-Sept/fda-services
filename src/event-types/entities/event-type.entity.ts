@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 
 @Entity({
-    name: 'eventTypes'
+    name: 'eventtypes'
 })
 export class EventType {
 

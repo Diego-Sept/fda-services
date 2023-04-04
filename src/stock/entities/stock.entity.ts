@@ -13,8 +13,14 @@ export class Stock {
     @ManyToOne(() => Product, (product) => product.id)
     product: Product;
 
+    @Column()
+    productId: number;
+
     @ManyToOne(() => Store, (store) => store.id)
     store: Store;
+
+    @Column()
+    storeId: number;
 
     @Column()
     quantity: number;

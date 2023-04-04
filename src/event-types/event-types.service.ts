@@ -1,26 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateEventTypeDto } from './dto/create-event-type.dto';
 import { UpdateEventTypeDto } from './dto/update-event-type.dto';
+import { EventType } from './entities/event-type.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class EventTypesService {
-  create(createEventTypeDto: CreateEventTypeDto) {
-    return 'This action adds a new eventType';
+
+  private readonly logger = new Logger(EventTypesService.name);
+
+  constructor(
+    @InjectRepository(EventType)
+    private eventTypeRepository: Repository<EventType>
+  ){}
+
+  async create(createEventTypeDto: CreateEventTypeDto) {
+    return await this.eventTypeRepository.save(createEventTypeDto);
   }
 
-  findAll() {
-    return `This action returns all eventTypes`;
+  async findAll() {
+    return await this.eventTypeRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} eventType`;
+  async findOne(id: number) {
+    return await this.eventTypeRepository.findOneBy({id: id});
   }
 
-  update(id: number, updateEventTypeDto: UpdateEventTypeDto) {
-    return `This action updates a #${id} eventType`;
+  async update(id: number, updateEventTypeDto: UpdateEventTypeDto) {
+    let eventTypeToUpdate : EventType = await this.findOne(id);
+
+    if (!!eventTypeToUpdate){
+      eventTypeToUpdate.name = updateEventTypeDto.name;
+    } 
+        
+    return await this.eventTypeRepository.save(eventTypeToUpdate);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} eventType`;
+  async remove(id: number) {
+    return await this.eventTypeRepository.delete(id);
   }
 }

@@ -1,1 +1,9 @@
-export class CreateStockDto {}
+export class CreateStockDto {
+
+    productId: number;
+
+    storeId: number;
+
+    quantity: number;
+
+}

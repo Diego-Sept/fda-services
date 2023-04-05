@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ClientFractionService } from './client-fraction.service';
 import { CreateClientFractionDto } from './dto/create-client-fraction.dto';
-import { UpdateClientFractionDto } from './dto/update-client-fraction.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Client Fractions")
 @Controller('client-fraction')
 export class ClientFractionController {
   constructor(private readonly clientFractionService: ClientFractionService) {}
@@ -20,11 +21,6 @@ export class ClientFractionController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.clientFractionService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClientFractionDto: UpdateClientFractionDto) {
-    return this.clientFractionService.update(+id, updateClientFractionDto);
   }
 
   @Delete(':id')

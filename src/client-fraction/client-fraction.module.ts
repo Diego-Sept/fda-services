@@ -6,7 +6,7 @@ import { ClientFraction } from './entities/client-fraction.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ClientFraction])
+    TypeOrmModule.forFeature([ClientFraction]),
   ],
   controllers: [ClientFractionController],
   providers: [ClientFractionService],

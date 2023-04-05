@@ -47,6 +47,7 @@ import { AuthModule } from './auth/auth.module';
           EventType,
           Saloon,
           Fraction,
+          ClientFraction,
       ],
       synchronize: true,
       migrationsRun: false

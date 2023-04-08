@@ -36,4 +36,8 @@ export class ClientFractionService {
 	async getByFractionId(fractionId: number){
 		return await this.clientFractionRepository.findBy({fractionId: fractionId});
 	}
+
+	async getByClientId(clientId: number) {
+		return await this.clientFractionRepository.findOne({ where: { clientId } });
+	}
 }

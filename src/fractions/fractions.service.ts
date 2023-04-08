@@ -107,4 +107,8 @@ export class FractionsService {
 
 		return await this.clientFractionService.create(createClientFractionDto);
 	}
+
+	async getClientFractions(clientId: number) {
+        return await this.clientFractionService.getByClientId(clientId);
+    }
 }

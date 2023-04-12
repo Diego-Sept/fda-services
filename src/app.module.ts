@@ -26,6 +26,9 @@ import { BudgetsModule } from './budgets/budgets.module';
 import { Saloon } from './saloons/entities/saloon.entity';
 import { EventType } from './event-types/entities/event-type.entity';
 import { AuthModule } from './auth/auth.module';
+import { EventsModule } from './events/events.module';
+import { Budget } from './budgets/entities/budget.entity';
+import { Event } from './events/entities/event.entity';
 
 @Module({
   imports: [
@@ -48,6 +51,8 @@ import { AuthModule } from './auth/auth.module';
           Saloon,
           Fraction,
           ClientFraction,
+          Budget,
+          Event
       ],
       synchronize: true,
       migrationsRun: false
@@ -65,6 +70,7 @@ import { AuthModule } from './auth/auth.module';
     SaloonsModule,
     BudgetsModule,
     AuthModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -37,13 +37,13 @@ export class Budget {
     amount: number;
 
     @ManyToOne(() => Saloon, (saloon) => saloon.id)
-    saloon: number;
+    saloon: Saloon;
 
     @Column()
     saloonId: number;
 
     @ManyToOne(() => EventType, (eventType) => eventType.id)
-    eventType: number;
+    eventType: EventType;
 
     @Column()
     eventTypeId: number;

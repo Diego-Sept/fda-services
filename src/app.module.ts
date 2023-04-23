@@ -29,6 +29,14 @@ import { AuthModule } from './auth/auth.module';
 import { EventsModule } from './events/events.module';
 import { Budget } from './budgets/entities/budget.entity';
 import { Event } from './events/entities/event.entity';
+import { EventStatesModule } from './event-states/event-states.module';
+import { EventState } from './event-states/entities/event-state.entity';
+import { PaymentPlanModule } from './payment-plan/payment-plan.module';
+import { DuesModule } from './dues/dues.module';
+import { PaymentsModule } from './payments/payments.module';
+import { PaymentPlan } from './payment-plan/entities/payment-plan.entity';
+import { Due } from './dues/entities/due.entity';
+import { Payment } from './payments/entities/payment.entity';
 
 @Module({
   imports: [
@@ -52,7 +60,11 @@ import { Event } from './events/entities/event.entity';
           Fraction,
           ClientFraction,
           Budget,
-          Event
+          Event,
+          EventState,
+          PaymentPlan,
+          Due,
+          Payment
       ],
       synchronize: true,
       migrationsRun: false
@@ -71,6 +83,10 @@ import { Event } from './events/entities/event.entity';
     BudgetsModule,
     AuthModule,
     EventsModule,
+    EventStatesModule,
+    PaymentPlanModule,
+    DuesModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [

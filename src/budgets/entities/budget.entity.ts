@@ -1,8 +1,9 @@
 import { Client } from "src/clients/entities/client.entity";
+import { EventState } from "src/event-states/entities/event-state.entity";
 import { EventType } from "src/event-types/entities/event-type.entity";
+import { Event } from "src/events/entities/event.entity";
 import { Fraction } from "src/fractions/entities/fraction.entity";
-import { Saloon } from "src/saloons/entities/saloon.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
     name: 'budgets'
@@ -12,41 +13,17 @@ export class Budget {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @ManyToOne(() => Event, (event) => { event.id })
+    event: Event;
+
     @Column()
-    title: string;
+    eventId: number;
 
     @Column()
     createdAt: Date;
 
     @Column()
-    stateId: number;
-
-    @Column({nullable: true})
-    clientId: number;
-    
-    @ManyToOne(() => Client, (client) => client.id)
-    client: Client;
-
-    @Column({nullable: true})
-    fractionId: number;
-
-    @ManyToOne(() => Fraction, (fraction) => fraction.id)
-    fraction: Fraction;
-
-    @Column()
     amount: number;
-
-    @ManyToOne(() => Saloon, (saloon) => saloon.id)
-    saloon: Saloon;
-
-    @Column()
-    saloonId: number;
-
-    @ManyToOne(() => EventType, (eventType) => eventType.id)
-    eventType: EventType;
-
-    @Column()
-    eventTypeId: number;
 
     @Column()
     expirationDate: Date;

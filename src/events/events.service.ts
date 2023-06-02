@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger, NotFoundException, forwardRef } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { EventRequestDto } from './dto/event-request.dto';
@@ -11,6 +11,7 @@ import { FractionsService } from 'src/fractions/fractions.service';
 import { SaloonsService } from 'src/saloons/saloons.service';
 import { Repository } from 'typeorm';
 import { EventStatesService } from 'src/event-states/event-states.service';
+import { EventResponseDto } from './dto/event-response-dto';
 
 @Injectable()
 export class EventsService {
@@ -32,7 +33,7 @@ export class EventsService {
 		private eventStateService: EventStatesService,
 	) { }
 
-	async create(eventRequestDto: EventRequestDto) {
+	async create(eventRequestDto: EventRequestDto, compose: boolean = true) {
 		if (!!eventRequestDto.client) {
 			let client = this.clientService.findOne(eventRequestDto.client.id);
 			client.catch(e => {
@@ -68,30 +69,104 @@ export class EventsService {
 				throw new BadRequestException("No se encontró el estado seleccionado.", e);
 			})
 		}
-		if (!eventRequestDto.title){
+		if (!eventRequestDto.title) {
 			this.logger.warn("Title is requested");
 			throw new BadRequestException("El título es requerido.");
 		}
-		if (!eventRequestDto.startDate && !eventRequestDto.endDate){
+		if (!eventRequestDto.startDate && !eventRequestDto.endDate) {
 			this.logger.warn("Date is requested");
 			throw new BadRequestException("Se requiere una fecha del evento.");
 		}
-		return await this.eventsRepository.save(eventRequestDto);
+		let eventEntity = await this.eventsRepository.save(eventRequestDto);
+
+		if (!!compose) {
+			return await this.getEvent(eventEntity);
+		} else {
+			return eventEntity;
+		}
 	}
 
 	async findAll() {
-		return await this.eventsRepository.find();
+		const events: Event[] = await this.eventsRepository.find();
+
+		const eventsResponse: EventResponseDto[] = [];
+
+		for (const event of events) {
+			const eventResponseDTO = await this.getEvent(event);
+			eventsResponse.push(eventResponseDTO);
+		}
+
+		return eventsResponse;
 	}
 
-	async findOne(id: number) {
-		return await this.eventsRepository.findOneBy({id: id});
+	async findOne(id: number, compose: boolean = true) {
+		const eventEntity: Event = await this.eventsRepository.findOneBy({ id: id });
+
+		if (!eventEntity) {
+			throw new NotFoundException('No se encontró el evento solicitado');
+		}
+
+		if (!!compose) {
+			return await this.getEvent(eventEntity);
+		} else {
+			return eventEntity;
+		}
 	}
 
-	async update(id: number, updateEventDto: UpdateEventDto) {
-		return `This action updates a #${id} event`;
+	async update(id: number, eventRequestDto: EventRequestDto, compose: boolean = true) {
+		let eventEntity = await this.findOne(id, false) as Event;
+
+		if (!!eventRequestDto) {
+			eventEntity.clientId = eventRequestDto.client?.id;
+			eventEntity.saloonId = eventRequestDto.saloon.id;
+			eventEntity.eventTypeId = eventRequestDto.eventType.id;
+			eventEntity.fractionId = eventRequestDto.fraction?.id;
+			eventEntity.stateId = eventRequestDto.state?.id;
+			eventEntity.startDate = eventRequestDto.startDate;
+			eventEntity.endDate = eventRequestDto.endDate;
+			eventEntity.observations = eventRequestDto.observations;
+			eventEntity.title = eventRequestDto.title;
+			eventEntity = await this.eventsRepository.save(eventEntity);
+		} else {
+			throw new BadRequestException("Debe enviar los datos del evento para actualizar.")
+		}
+
+		if (!!compose) {
+			return await this.getEvent(eventEntity);
+		} else {
+			return eventEntity;
+		}
 	}
 
-	async remove(id: number) {
-		return await this.eventsRepository.delete(id);
+	async remove(id: number): Promise<void> {
+		const eventEntity = await this.findOne(id);
+
+		if (!eventEntity) {
+			throw new NotFoundException('No se encontró el evento solicitado');
+		}
+
+		await this.eventsRepository.delete(id);
+	}
+
+	async getEvent(event: Event) {
+		let eventResponseDto: EventResponseDto = { ...event };
+
+		if (!!event.clientId) {
+			eventResponseDto.client = await this.clientService.findOne(event.clientId);
+		}
+		if (!!event.fractionId) {
+			eventResponseDto.fraction = await this.fractionService.findOne(event.fractionId);
+		}
+		if (!!event.saloonId) {
+			eventResponseDto.saloon = await this.saloonsService.findOne(event.saloonId);
+		}
+		if (!!event.eventTypeId) {
+			eventResponseDto.eventType = await this.eventTypesService.findOne(event.eventTypeId);
+		}
+		if (!!event.stateId) {
+			eventResponseDto.state = await this.eventStateService.findOne(event.stateId);
+		}
+
+		return eventResponseDto;
 	}
 }

@@ -1,34 +1,57 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, BadRequestException } from '@nestjs/common';
 import { EventsService } from './events.service';
-import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
+import { EventRequestDto } from './dto/event-request.dto';
 
 @Controller('events')
-export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+export class EventController {
+	constructor(private readonly eventService: EventsService) { }
 
-  @Post()
-  create(@Body() createEventDto: CreateEventDto) {
-    return this.eventsService.create(createEventDto);
-  }
+	@Post()
+	async create(@Body() eventRequestDto: EventRequestDto) {
+		try {
+			const createdEvent = await this.eventService.create(eventRequestDto);
+			return createdEvent;
+		} catch (error) {
+			throw new BadRequestException('No se pudo crear el evento');
+		}
+	}
 
-  @Get()
-  findAll() {
-    return this.eventsService.findAll();
-  }
+	@Get()
+	async findAll() {
+		try {
+			const events = await this.eventService.findAll();
+			return events;
+		} catch (error) {
+			throw new NotFoundException('No se encontraron eventos');
+		}
+	}
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(+id);
-  }
+	@Get(':id')
+	async findOne(@Param('id') id: number) {
+		try {
+			const event = await this.eventService.findOne(id);
+			return event;
+		} catch (error) {
+			throw new NotFoundException('No se encontró el evento solicitado');
+		}
+	}
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
-    return this.eventsService.update(+id, updateEventDto);
-  }
+	@Patch(':id')
+	async update(@Param('id') id: number, @Body() eventRequestDto: EventRequestDto) {
+		try {
+			const updatedEvent = await this.eventService.update(id, eventRequestDto);
+			return updatedEvent;
+		} catch (error) {
+			throw new BadRequestException('No se pudo actualizar el evento');
+		}
+	}
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventsService.remove(+id);
-  }
+	@Delete(':id')
+	async remove(@Param('id') id: number) {
+		try {
+			await this.eventService.remove(id);
+		} catch (error) {
+			throw new NotFoundException('No se encontró el evento solicitado');
+		}
+	}
 }

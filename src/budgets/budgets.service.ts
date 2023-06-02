@@ -1,4 +1,4 @@
-import { BadRequestException, forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ClientFractionService } from 'src/client-fraction/client-fraction.service';
 import { ClientsService } from 'src/clients/clients.service';
@@ -13,6 +13,8 @@ import { Budget } from './entities/budget.entity';
 import { EventsService } from 'src/events/events.service';
 import { ApiConflictResponse, ApiInternalServerErrorResponse } from '@nestjs/swagger';
 import { CreateBudgetDto } from './dto/create-budget.dto';
+import moment from 'moment';
+import { BudgetResponseDto } from './dto/budget-response.dto';
 
 @Injectable()
 export class BudgetsService {
@@ -22,22 +24,12 @@ export class BudgetsService {
 	constructor(
 		@InjectRepository(Budget)
 		private budgetsRepository: Repository<Budget>,
-		@Inject(forwardRef(() => ClientFractionService))
-		private clientFractionService: ClientFractionService,
-		@Inject(forwardRef(() => ClientsService))
-		private clientService: ClientsService,
-		@Inject(forwardRef(() => FractionsService))
-		private fractionService: FractionsService,
-		@Inject(forwardRef(() => SaloonsService))
-		private saloonsService: SaloonsService,
-		@Inject(forwardRef(() => EventTypesService))
-		private eventTypesService: EventTypesService,
 		@Inject(forwardRef(() => EventsService))
 		private eventsService: EventsService,
 	) { }
 
 	async create(budgetRequestDto: BudgetRequestDto) {
-		if (!budgetRequestDto.amount){
+		if (!budgetRequestDto.amount) {
 			this.logger.error("Amount is required");
 			throw new BadRequestException("El monto es requerido.");
 		}
@@ -49,14 +41,14 @@ export class BudgetsService {
 			throw new BadRequestException("Ha ocurrido un error al crear el evento.");
 		})
 		let budgetCreated = null;
-		if (!!eventCreated){
-			let createBudgetDto : CreateBudgetDto = {
+		if (!!eventCreated) {
+			let createBudgetDto: CreateBudgetDto = {
+				createdAt: moment().toDate(),
 				amount: budgetRequestDto.amount,
-				event: eventCreated
+				event: eventCreated,
+				expirationDate: moment().add(30, "days").toDate()
 			}
-			this.budgetsRepository.save(createBudgetDto).then(budget => {
-				
-			})
+			budgetCreated = await this.budgetsRepository.save(createBudgetDto);
 		}
 
 		return await budgetCreated;
@@ -67,7 +59,7 @@ export class BudgetsService {
 	}
 
 	async findOne(id: number) {
-		return await `This action returns a #${id} budget`;
+		return await this.budgetsRepository.findOneBy({ id: id });
 	}
 
 	async update(id: number, updateBudgetDto: UpdateBudgetDto) {
@@ -75,10 +67,29 @@ export class BudgetsService {
 	}
 
 	async remove(id: number) {
-		return await `This action removes a #${id} budget`;
+		let budget: Budget = await this.findOne(id);
+
+		if (!!budget) {
+			this.eventsService.remove(budget.eventId);
+		} else {
+			this.logger.error("The buidget with id " + id + " couldn't been found.");
+			return new NotFoundException("The buidget with id " + id + " couldn't been found.");
+		}
+
+		return await this.budgetsRepository.delete(id);
 	}
 
-	async getBudget(id : number){
+	async getBudget(budget: Budget) {
+		let budgetResponseDto: BudgetResponseDto = {
+			id: budget.id,
+			amount: budget.amount,
+			createdAt: budget.createdAt,
+			eventId: budget.eventId,
+			expirationDate: budget.expirationDate
+		};
 
+		budgetResponseDto.event = await this.eventsService.findOne(budget.eventId);
+
+		return budgetResponseDto;
 	}
 }

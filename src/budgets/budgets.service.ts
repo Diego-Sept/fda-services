@@ -1,17 +1,9 @@
 import { BadRequestException, forwardRef, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ClientFractionService } from 'src/client-fraction/client-fraction.service';
-import { ClientsService } from 'src/clients/clients.service';
-import { EventTypesService } from 'src/event-types/event-types.service';
-import { Fraction } from 'src/fractions/entities/fraction.entity';
-import { FractionsService } from 'src/fractions/fractions.service';
-import { SaloonsService } from 'src/saloons/saloons.service';
 import { Repository } from 'typeorm';
 import { BudgetRequestDto } from './dto/budget-request.dto';
-import { UpdateBudgetDto } from './dto/update-budget.dto';
 import { Budget } from './entities/budget.entity';
 import { EventsService } from 'src/events/events.service';
-import { ApiConflictResponse, ApiInternalServerErrorResponse } from '@nestjs/swagger';
 import { CreateBudgetDto } from './dto/create-budget.dto';
 import moment from 'moment';
 import { BudgetResponseDto } from './dto/budget-response.dto';
@@ -55,25 +47,62 @@ export class BudgetsService {
 	}
 
 	async findAll() {
-		return await `This action returns all budgets`;
+		let budgets : Budget[] = await this.budgetsRepository.find();
+
+		let budgetsResponse : BudgetResponseDto[] = [];
+
+		for (let budget of budgets){
+			budgetsResponse.push(await this.getBudget(budget));
+		}
+
+		return await budgetsResponse;
 	}
 
-	async findOne(id: number) {
-		return await this.budgetsRepository.findOneBy({ id: id });
+	async findOne(id: number, compose: boolean = false) {
+		return await this.budgetsRepository.findOneBy({ id: id }).then(async budget => {
+			if (!!compose){
+				return await this.getBudget(budget);
+			} else {
+				return await budget;
+			}
+		})
 	}
 
-	async update(id: number, updateBudgetDto: UpdateBudgetDto) {
-		return await `This action updates a #${id} budget`;
+	async update(id: number, budgetRequestDto: BudgetRequestDto) {
+		let budgetToUpdate : Budget = await this.budgetsRepository.findOneBy({ id: id });
+
+		let budgetUpdated = undefined;
+
+		if (!!budgetToUpdate){
+			if (!!budgetRequestDto?.event){
+				await this.eventsService.update(budgetRequestDto.event.id, budgetRequestDto.event)
+			}
+			let budget  : Budget = {
+				id: budgetToUpdate.id,
+				createdAt: budgetToUpdate.createdAt,
+				expirationDate: budgetToUpdate.expirationDate,
+				eventId: budgetToUpdate.eventId,
+				event: budgetToUpdate.event,
+				amount: budgetRequestDto.amount
+			}
+
+			budgetUpdated = await this.budgetsRepository.save(budget);
+		} else {
+			this.logger.error("The budget with id " + id + " couldn't been found.");
+			return new NotFoundException("The budget with id " + id + " couldn't been found.");
+		}
+
+		return await this.getBudget(budgetUpdated);
 	}
 
 	async remove(id: number) {
-		let budget: Budget = await this.findOne(id);
+		let budget: Budget = await this.budgetsRepository.findOneBy({ id: id });
 
 		if (!!budget) {
 			this.eventsService.remove(budget.eventId);
 		} else {
-			this.logger.error("The buidget with id " + id + " couldn't been found.");
-			return new NotFoundException("The buidget with id " + id + " couldn't been found.");
+			this.logger.error("The budget with id " + id + " couldn't been found.");
+			return new NotFoundException("The budget with id " + id + " couldn't been found.");
 		}
 
 		return await this.budgetsRepository.delete(id);

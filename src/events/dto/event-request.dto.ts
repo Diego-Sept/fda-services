@@ -7,6 +7,8 @@ import { Saloon } from "src/saloons/entities/saloon.entity";
 
 export interface EventRequestDto {
 
+    id?: number;
+
     title: string;
 
     client: Client;

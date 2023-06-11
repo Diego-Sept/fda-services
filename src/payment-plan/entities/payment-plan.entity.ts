@@ -1,3 +1,4 @@
+import { Budget } from "src/budgets/entities/budget.entity";
 import { Client } from "src/clients/entities/client.entity";
 import { Due } from "src/dues/entities/due.entity";
 import { Event } from "src/events/entities/event.entity";
@@ -12,16 +13,19 @@ export class PaymentPlan {
     id: number;
 
     @Column()
+    title: string;
+
+    @Column()
     clientId: number;
 
     @ManyToOne(() => Client, (client) => { client.id })
     client: Client;
 
     @Column()
-    eventId: number;
+    budgetId: number;
 
-    @ManyToOne(() => Event, (event) => { event.id })
-    event: Event;
+    @ManyToOne(() => Budget, (budget) => { budget.id })
+    budget: Budget;
 
     @OneToMany(() => Due, (due) => due.paymentPlan)
     dues: Due[];

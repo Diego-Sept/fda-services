@@ -2,14 +2,15 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PaymentPlanService } from './payment-plan.service';
 import { CreatePaymentPlanDto } from './dto/create-payment-plan.dto';
 import { UpdatePaymentPlanDto } from './dto/update-payment-plan.dto';
+import { PaymentPlanRequestDtO } from './dto/payment-plan-request.dto';
 
 @Controller('payment-plan')
 export class PaymentPlanController {
   constructor(private readonly paymentPlanService: PaymentPlanService) {}
 
   @Post()
-  create(@Body() createPaymentPlanDto: CreatePaymentPlanDto) {
-    return this.paymentPlanService.create(createPaymentPlanDto);
+  create(@Body() paymentPlanRequestDtO: PaymentPlanRequestDtO) {
+    return this.paymentPlanService.create(paymentPlanRequestDtO);
   }
 
   @Get()

@@ -1,8 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { BudgetsService } from './budgets.service';
 import { BudgetRequestDto } from './dto/budget-request.dto';
-import { CreateBudgetDto } from './dto/create-budget.dto';
-import { UpdateBudgetDto } from './dto/update-budget.dto';
 
 @Controller('budgets')
 export class BudgetsController {
@@ -24,8 +22,8 @@ export class BudgetsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBudgetDto: UpdateBudgetDto) {
-    return this.budgetsService.update(+id, updateBudgetDto);
+  update(@Param('id') id: string, @Body() budgetRequestDto: BudgetRequestDto) {
+    return this.budgetsService.update(+id, budgetRequestDto);
   }
 
   @Delete(':id')

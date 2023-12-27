@@ -11,8 +11,8 @@ export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   @Post()
-  create(@Body() clientDto: ClientDto) {
-    return this.clientsService.create(clientDto);
+  async create(@Body() clientDto: ClientDto) {
+    return await this.clientsService.create(clientDto);
   }
 
   @Get()

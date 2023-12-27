@@ -44,7 +44,7 @@ import { Payment } from './payments/entities/payment.entity';
       type: 'mysql',
       host: 'localhost',
       port: 3306,
-      username: 'root',
+      username: 'fda_user',
       password: 'root',
       database: 'fda',
       entities: [

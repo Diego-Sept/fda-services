@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { DuesService } from 'src/dues/dues.service';
 import { PaymentPlanResponseDTO } from './dto/payment-plan-response.dto';
 import { BudgetsService } from 'src/budgets/budgets.service';
+import { PaymentPlanRequestDtO } from './dto/payment-plan-request.dto';
 
 @Injectable()
 export class PaymentPlanService {
@@ -28,7 +29,9 @@ export class PaymentPlanService {
 		private budgetService: BudgetsService
 	) { }
 
-	async create(createPaymentPlanDto: CreatePaymentPlanDto) {
+	async create(paymentPlanRequestDtO: PaymentPlanRequestDtO) {
+		
+
 		return 'This action adds a new paymentPlan';
 	}
 
